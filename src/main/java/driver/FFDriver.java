@@ -8,7 +8,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import utilities.EnvUtil;
+import utilities.PropertyUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,13 +32,14 @@ public class FFDriver implements IDriver {
 
     public FFDriver(Scenario sc) {
         this.scenario = sc;
-        prop = EnvUtil.getProperties();
+        prop = PropertyUtil.getProperties();
         AUTOMATE_USERNAME = prop.getProperty("Browserstack_username");
         AUTOMATE_ACCESS_KEY = prop.getProperty("Browserstack_password");
         URL = "https://" + AUTOMATE_USERNAME + ":" + AUTOMATE_ACCESS_KEY + "@hub.browserstack.com/wd/hub";
     }
+
     public FFDriver() {
-        prop = EnvUtil.getProperties();
+        prop = PropertyUtil.getProperties();
         AUTOMATE_USERNAME = prop.getProperty("Browserstack_username");
         AUTOMATE_ACCESS_KEY = prop.getProperty("Browserstack_password");
         URL = "https://" + AUTOMATE_USERNAME + ":" + AUTOMATE_ACCESS_KEY + "@hub.browserstack.com/wd/hub";
@@ -61,7 +62,7 @@ public class FFDriver implements IDriver {
 			}*/
             setOptions();
             driver.manage().timeouts().pageLoadTimeout(BasicConstants.FIREFOX_PAGE_LOAD_TIME_OUT, TimeUnit.SECONDS);
-            driver.manage().timeouts().implicitlyWait(BasicConstants.IMPLICIT_WAIT_TIMEOUT, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(BasicConstants.IMPLICIT_WAIT_TIMEOUT_GENERIC, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();
         }

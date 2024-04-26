@@ -138,15 +138,6 @@
     </dependencies>
 
     <build>
-        <filters>
-            <filter>src/main/resources/DataConfig/Browser.properties</filter>
-        </filters>
-        <resources>
-            <resource>
-                <directory>src/main/resources/DataConfig</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -253,8 +244,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.source}</target>
+                    <source>16</source>
+                    <target>16</target>
                 </configuration>
             </plugin>
         </plugins>

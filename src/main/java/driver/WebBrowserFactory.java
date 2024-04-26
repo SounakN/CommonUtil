@@ -1,34 +1,38 @@
 package driver;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 
+@Slf4j
 public class WebBrowserFactory {
 
     public static ThreadLocal<IDriver> DriverService = new ThreadLocal<>();
     private static Browsers browsers;
 
-    public void setBrowserType(String BrowserType) throws Exception {
+    @SneakyThrows
+    public void setBrowserType(String BrowserType) {
         browsers = Browsers.get(BrowserType);
         if (DriverService.get() == null) {
-            System.out.print("Thread id :: " + Thread.currentThread().getId() + " got in to the block");
             switch (browsers) {
                 case CHROME:
                     DriverService.set(new CHDriver());
+                    log.info("ChromeDriver initiation completed");
                     break;
 
                 case FIREFOX:
                     DriverService.set(new FFDriver());
+                    log.info("FireFox initiation completed");
                     break;
 
                 case EDGE:
                     DriverService.set(new EDGEDriver());
+                    log.info("Edge initiation completed");
                     break;
                 default:
                     break;
             }
 
-        } else {
-            System.out.print("Thread id :: " + Thread.currentThread().getId() + " DIDNOT got in to the block");
         }
     }
 
@@ -36,9 +40,8 @@ public class WebBrowserFactory {
         return DriverService.get().get();
     }
 
-    // To stop the driver
     public void quit() throws Exception {
-        /*getDriver().quit();*/
         DriverService.get().stopDriver();
+        log.info("Driver stopped");
     }
 }

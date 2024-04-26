@@ -27,8 +27,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static driver.BasicConstants.EXPLICIT_WAIT_TIMEOUT;
-import static driver.BasicConstants.IMPLICIT_WAIT_TIMEOUT;
+import static driver.BasicConstants.EXPLICIT_WAIT_TIMEOUT_GENERIC;
+import static driver.BasicConstants.IMPLICIT_WAIT_TIMEOUT_GENERIC;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
@@ -787,7 +787,7 @@ public class ActionMethods {
 
     public static Boolean waitforDOMStability(WebDriver driver) {
         try {
-            Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT));
+            Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
             Boolean x = wait.until((ExpectedCondition<Boolean>) check -> {
                 ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
                 return true;
@@ -806,7 +806,7 @@ public class ActionMethods {
 
     //Turn on the implicit wait
     public static void turnOnImplicitWaits(WebDriver driver) {
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(IMPLICIT_WAIT_TIMEOUT));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(IMPLICIT_WAIT_TIMEOUT_GENERIC));
     }
 
     //Assert the exact matching of a send in text with an Element Text

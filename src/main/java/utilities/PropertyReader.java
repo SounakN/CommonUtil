@@ -1,18 +1,22 @@
 package utilities;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Properties;
 
+@Slf4j
 public class PropertyReader {
 
 
-    // Public method for reading the property
+    @SneakyThrows
     public static Properties getProperties(String fileName) {
         Properties props = new Properties();
         try {
@@ -25,24 +29,24 @@ public class PropertyReader {
     }
 
     @SneakyThrows
-    public static Properties loadAllProperties(String env) {
+    public static Properties loadAllProperties(String rootEnv) {
         Properties props = new Properties();
-        URL resource = PropertyReader.class.getClassLoader().getResource("");
-        Arrays.stream(new File(resource.toURI()).listFiles()).filter(x -> x.getName().endsWith(".properties")).forEach(file -> {
-            props.putAll(getProperties(file.getName()));
+        Path path = new File(Objects.requireNonNull(PropertyReader.class.getClassLoader().getResource("")).getFile()).toPath();
+        Files.list(path).filter(rootFile -> rootFile.getFileName().toString().endsWith(".properties")).forEach(file -> {
+            props.putAll(getProperties(String.valueOf(file.getFileName())));
         });
-        Arrays.stream(Arrays.stream(new File(resource.toURI()).listFiles()).filter(x -> x.getName().equals("Dev")).findFirst().get().listFiles()).filter(x -> x.getName().endsWith(".properties")).forEach(file -> {
-            props.putAll(getProperties("Dev" + File.separator + file.getName()));
-        });
-			/*dir = new File(System.getProperty("user.dir")+ "/src/test/resources/DataConfig/"+env);
-			for (File file : dir.listFiles())
-			{
-				if (file.getName().endsWith((".properties")))
-				{
-					props.putAll(getProperties("/src/test/resources/DataConfig/" + env + "/"+ file.getName()));
-					*//*props.putAll(getProperties( env + "/"+ file.getName()));*//*
-				}
-			}*/
+
+        if (rootEnv != null) {
+            if (Files.exists(Paths.get(new File(Objects.requireNonNull(PropertyReader.class.getClassLoader().getResource("")).getFile()).toString(), rootEnv))) {
+                Files.list(Files.list(path).filter(rootFile -> rootFile.getFileName().toString().equals(rootEnv)).findFirst().get()).filter(childFile -> childFile.getFileName().toString().endsWith(".properties")).forEach(file -> {
+                    props.putAll(getProperties(rootEnv + File.separator + file.getFileName()));
+                });
+            } else {
+                log.info("The Environment folder does not exists");
+            }
+        } else {
+            log.info("The Environment folder value has been sent as null");
+        }
         return props;
     }
 }
