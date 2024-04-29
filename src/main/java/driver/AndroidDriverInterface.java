@@ -54,7 +54,7 @@ public interface AndroidDriverInterface extends IMobDriver {
         @SneakyThrows
         public void startDriver() {
 
-            if (BasicConstants.browserStackSwitch.equals("false")) {
+            if (browserStackSwitch.equals("false")) {
                 if (service == null) {
                     service = AppiumDriverLocalService.buildService(new AppiumServiceBuilder().usingAnyFreePort().withArgument(() -> "--allow-insecure", "chromedriver_autodownload"));
                 }
@@ -87,9 +87,12 @@ public interface AndroidDriverInterface extends IMobDriver {
                 caps.setCapability("real_mobile", "true");
                 caps.setCapability("browserstack.console", "errors");
                 caps.setCapability("browserstack.networkLogs", "true");
-                caps.setCapability("browser", BasicConstants.browserStackMobileBrowser);
+                caps.setCapability("browser", browserStackMobileBrowser);
                 caps.setCapability("browserstack.networkProfile", "4g-lte-good");
-                caps.setCapability("browserstack.local", BasicConstants.browserStackLocal);
+                caps.setCapability("browserstack.idleTimeout", "120");
+                caps.setCapability("browserstack.local", browserStackLocal);
+                caps.setCapability("browserstack.acceptInsecureCerts", "true");
+                caps.setCapability("browserstack.appium_version", "1.22.0");
                 /*caps.setCapability("browserstack.localIdentifier", Timestampidentifier);*/
                 try {
                     driver = new AppiumDriver(new URL(URL), caps);
@@ -156,7 +159,7 @@ public interface AndroidDriverInterface extends IMobDriver {
         public static String AUTOMATE_ACCESS_KEY;
         public static String URL;
         /*    private Local l;*/
-        private String timeStampIdentifier = null;
+        private String timeStampIdentifier;
         private HashMap var = new HashMap<String, String>();
         public AppiumDriver driver;
         public static AppiumDriverLocalService service;
@@ -201,7 +204,7 @@ public interface AndroidDriverInterface extends IMobDriver {
 
                 //For Browserstack
                 caps.setCapability("os_version", browserStackMobileOsVersion);
-                caps.setCapability("device", BasicConstants.browserStackMobileDevice);
+                caps.setCapability("device", browserStackMobileDevice);
                 caps.setCapability("build", System.getenv("BROWSERSTACK_BUILD_NAME"));
                 caps.setCapability("real_mobile", "true");
                 caps.setCapability("browserstack.console", "errors");
@@ -210,8 +213,9 @@ public interface AndroidDriverInterface extends IMobDriver {
                 caps.setCapability("browserstack.idleTimeout", "120");
                 caps.setCapability("browserstack.networkProfile", "4g-lte-good");
                 caps.setCapability("browserstack.local", browserStackLocal);
+                caps.setCapability("browserstack.acceptInsecureCerts", "true");
                 caps.setCapability("autoGrantPermissions", "true");
-                caps.setCapability("browserstack.localIdentifier", timeStampIdentifier);
+                /*  caps.setCapability("browserstack.localIdentifier", timeStampIdentifier);*/
                 caps.setCapability("browserstack.appium_version", "1.22.0");
 
                 try {
