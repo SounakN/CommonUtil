@@ -7,8 +7,7 @@ public enum Browsers {
     FIREFOX,
     CHROME;
 
-    //Get the Enum
-    public static Browsers get(String s) {
-        return Browsers.valueOf(s.trim().toUpperCase());
+    public static Browsers get(String browser) {
+        return Browsers.valueOf(browser.trim().toUpperCase());
     }
 }

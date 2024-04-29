@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 
+import static driver.BasicConstants.DATA_CONFIG;
+
 @Slf4j
 public class PropertyReader {
 
@@ -32,14 +34,16 @@ public class PropertyReader {
     public static Properties loadAllProperties(String rootEnv) {
         Properties props = new Properties();
         Path path = new File(Objects.requireNonNull(PropertyReader.class.getClassLoader().getResource("")).getFile()).toPath();
-        Files.list(path).filter(rootFile -> rootFile.getFileName().toString().endsWith(".properties")).forEach(file -> {
-            props.putAll(getProperties(String.valueOf(file.getFileName())));
+        Path pathTillDataConfig = Files.list(path).filter(rootFile -> rootFile.getFileName().toString().equals("DataConfig")).findFirst().get();
+        Files.list(pathTillDataConfig).filter(rootFile -> rootFile.getFileName().toString().endsWith(".properties")).forEach(file -> {
+            props.putAll(getProperties(DATA_CONFIG + File.separator + file.getFileName()));
         });
 
         if (rootEnv != null) {
-            if (Files.exists(Paths.get(new File(Objects.requireNonNull(PropertyReader.class.getClassLoader().getResource("")).getFile()).toString(), rootEnv))) {
-                Files.list(Files.list(path).filter(rootFile -> rootFile.getFileName().toString().equals(rootEnv)).findFirst().get()).filter(childFile -> childFile.getFileName().toString().endsWith(".properties")).forEach(file -> {
-                    props.putAll(getProperties(rootEnv + File.separator + file.getFileName()));
+            Path pathToRootFolder = Paths.get(pathTillDataConfig.toString(), rootEnv);
+            if (Files.exists(pathToRootFolder)) {
+                Files.list(pathToRootFolder).filter(childFile -> childFile.getFileName().toString().endsWith(".properties")).forEach(file -> {
+                    props.putAll(getProperties(DATA_CONFIG + File.separator + rootEnv + File.separator + file.getFileName()));
                 });
             } else {
                 log.info("The Environment folder does not exists");

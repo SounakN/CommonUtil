@@ -12,57 +12,53 @@ import utilities.PropertyUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
+
+import static driver.BasicConstants.*;
 
 
 @SuppressWarnings("unused")
 public class FFDriver implements IDriver {
 
-    public WebDriver driver = null;
-    public Properties prop = null;
-    public String AUTOMATE_USERNAME = null;
-    public String AUTOMATE_ACCESS_KEY = null;
+    public WebDriver driver;
+    public Properties prop;
     public String URL = null;
     /*private  Local l;*/
     private HashMap var = new HashMap<String, String>();
-    private String Timestampidentifier = null;
+    private String timeStampIdentifier = null;
     private Scenario scenario;
 
     public FFDriver(Scenario sc) {
         this.scenario = sc;
         prop = PropertyUtil.getProperties();
-        AUTOMATE_USERNAME = prop.getProperty("Browserstack_username");
+        /*AUTOMATE_USERNAME = prop.getProperty("Browserstack_username");
         AUTOMATE_ACCESS_KEY = prop.getProperty("Browserstack_password");
-        URL = "https://" + AUTOMATE_USERNAME + ":" + AUTOMATE_ACCESS_KEY + "@hub.browserstack.com/wd/hub";
+        URL = "https://" + AUTOMATE_USERNAME + ":" + AUTOMATE_ACCESS_KEY + "@hub.browserstack.com/wd/hub";*/
     }
 
     public FFDriver() {
         prop = PropertyUtil.getProperties();
-        AUTOMATE_USERNAME = prop.getProperty("Browserstack_username");
+       /* AUTOMATE_USERNAME = prop.getProperty("Browserstack_username");
         AUTOMATE_ACCESS_KEY = prop.getProperty("Browserstack_password");
-        URL = "https://" + AUTOMATE_USERNAME + ":" + AUTOMATE_ACCESS_KEY + "@hub.browserstack.com/wd/hub";
+        URL = "https://" + AUTOMATE_USERNAME + ":" + AUTOMATE_ACCESS_KEY + "@hub.browserstack.com/wd/hub";*/
     }
 
     public void startDriver() {
         try {
-			/*if (BasicConstants.browserstack_local.equalsIgnoreCase("true") && BasicConstants.Browserstack_switch.equals("true") ) {
-				if(l==null)
-				{
-					var.put("key", AUTOMATE_ACCESS_KEY);
-					Timestampidentifier = System.getenv("BROWSERSTACK_LOCAL_IDENTIFIER")+"_"+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy.HH.MM.ss"));
-					var.put("localIdentifier", Timestampidentifier);
-				}
-				l = new Local();
-				l.start(var);
-			}else{
-				WebDriverManager.firefoxdriver().setup();
-//				System.setProperty("webdriver.gecko.driver", "src/test/resources/FirefoxDriver/geckodriver");
-			}*/
+            /*if (BasicConstants.browserstack_local.equalsIgnoreCase("true") && BasicConstants.Browserstack_switch.equals("true")) {
+                if (l == null) {
+                    var.put("key", AUTOMATE_ACCESS_KEY);
+                    timeStampIdentifier = System.getenv("BROWSERSTACK_LOCAL_IDENTIFIER") + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy.HH.MM.ss"));
+                    var.put("localIdentifier", timeStampIndentifier);
+                }
+                l = new Local();
+                l.start(var);
+            }*/
             setOptions();
-            driver.manage().timeouts().pageLoadTimeout(BasicConstants.FIREFOX_PAGE_LOAD_TIME_OUT, TimeUnit.SECONDS);
-            driver.manage().timeouts().implicitlyWait(BasicConstants.IMPLICIT_WAIT_TIMEOUT_GENERIC, TimeUnit.SECONDS);
+            driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(PAGE_LOAD_TIME_OUT));
+            driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(SCRIPT_LOAD_TIME_OUT));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,7 +79,6 @@ public class FFDriver implements IDriver {
             options.setHeadless(true);
         }
         if (BasicConstants.IsRemote.equals("true")) {
-            //specify the browser
             capabilities.setBrowserName("firefox");
             options.merge(capabilities);
             try {
@@ -92,20 +87,20 @@ public class FFDriver implements IDriver {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (BasicConstants.Browserstack_switch.equals("true")) {
+        } else if (BasicConstants.browserStackSwitch.equals("true")) {
             DesiredCapabilities cap = new DesiredCapabilities();
-            cap.setCapability("browser_version", BasicConstants.browser_version_firefox);
+            cap.setCapability("browser_version", browserStackBrowserVersionFireFox);
             cap.setCapability("build", System.getenv("BROWSERSTACK_BUILD_NAME"));
             cap.setCapability("name", scenario.getName());
-            cap.setCapability("os", BasicConstants.os);
-            cap.setCapability("os_version", BasicConstants.os_version);
-            cap.setCapability("browserstack.local", BasicConstants.browserstack_local);
+            cap.setCapability("os", browserStackOs);
+            cap.setCapability("os_version", browserStackOsVersion);
+            cap.setCapability("browserstack.local", browserStackLocal);
             cap.setCapability("browserstack.console", "info");
             HashMap<String, Boolean> networkLogsOptions = new HashMap<>();
             networkLogsOptions.put("captureContent", true);
             cap.setCapability("browserstack.networkLogs", true);
             cap.setCapability("browserstack.networkLogsOptions", networkLogsOptions);
-            cap.setCapability("browserstack.localIdentifier", Timestampidentifier);
+            cap.setCapability("browserstack.localIdentifier", timeStampIdentifier);
             options.merge(cap);
             try {
                 driver = new RemoteWebDriver(new URL(URL), options);
@@ -129,7 +124,6 @@ public class FFDriver implements IDriver {
         }
     }
 
-    // To stop the driver
     public void stopDriver() throws Exception {
         try {
             driver.quit();
@@ -144,8 +138,6 @@ public class FFDriver implements IDriver {
 
         }
     }
-
-    // To start the driver
 
     public WebDriver get() {
 

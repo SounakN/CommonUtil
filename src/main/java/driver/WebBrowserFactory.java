@@ -15,24 +15,13 @@ public class WebBrowserFactory {
         browsers = Browsers.get(BrowserType);
         if (DriverService.get() == null) {
             switch (browsers) {
-                case CHROME:
-                    DriverService.set(new CHDriver());
-                    log.info("ChromeDriver initiation completed");
-                    break;
-
-                case FIREFOX:
-                    DriverService.set(new FFDriver());
-                    log.info("FireFox initiation completed");
-                    break;
-
-                case EDGE:
-                    DriverService.set(new EDGEDriver());
-                    log.info("Edge initiation completed");
-                    break;
-                default:
-                    break;
+                case CHROME -> DriverService.set(new CHDriver());
+                case FIREFOX -> DriverService.set(new FFDriver());
+                case EDGE -> DriverService.set(new EDGEDriver());
+                default -> {
+                    log.info("Wrong choice of mobile Type so quiting the Run");
+                }
             }
-
         }
     }
 
