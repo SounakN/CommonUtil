@@ -1,15 +1,24 @@
 package utilities;
 
+import driver.MobileFactory;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.PerformsTouchActions;
+import io.appium.java_client.TouchAction;
 import io.cucumber.java.Scenario;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -21,11 +30,15 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 import static driver.BasicConstants.EXPLICIT_WAIT_TIMEOUT_GENERIC;
+import static io.appium.java_client.touch.WaitOptions.waitOptions;
+import static io.appium.java_client.touch.offset.PointOption.point;
+import static java.time.Duration.ofSeconds;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static utilities.ActionMethods.Scroll.ScrollMobile.scroll;
 
 
 @Slf4j
-public class ActionMethods {
+public class ActionMethods<T extends WebDriver> {
 
     public static WebDriverWait wait;
     public static Actions actions;
@@ -45,12 +58,31 @@ public class ActionMethods {
 
             return httpResponse.statusCode();
         } catch (Exception e) {
-            log.info("Exception is :: {}", e.getMessage());
             return 0;
         }
     }
 
-    public static boolean waitTillElementVisible(WebDriver driver, WebElement webElement, Duration timeOut) {
+    public Dimension getWindowSize(T driver) {
+        Dimension dimension;
+        try {
+            dimension = driver.manage().window().getSize();
+            return dimension;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    public int getSize(T driver,By locator) {
+        WebElement webElement=  findElement(locator,driver,Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC),Duration.ofSeconds(5));
+        assertThat(webElement).isNotNull();
+        return webElement.getSize().getHeight();
+    }
+
+    public Point getLocation(T driver,By locator) {
+        WebElement webElement=  findElement(locator,driver,Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC),Duration.ofSeconds(5));
+        assertThat(webElement).isNotNull();
+        return webElement.getLocation();
+    }
+    public boolean waitTillElementVisible(T driver, WebElement webElement, Duration timeOut) {
         try {
             wait = new WebDriverWait(driver, timeOut);
            return  wait.until(ExpectedConditions.visibilityOf(webElement)).isDisplayed();
@@ -58,36 +90,36 @@ public class ActionMethods {
             return false;
         }
     }
-    public static boolean waitTillElementVisible(WebDriver driver, WebElement webElement) {
+    public boolean waitTillElementVisible(T driver, WebElement webElement) {
         try {
             wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
             return  wait.until(ExpectedConditions.visibilityOf(webElement)).isDisplayed();
-        } catch (Exception e) {
+        } catch (TimeoutException e) {
             return false;
         }
     }
 
-    public static boolean waitTillElementInvisible(WebDriver driver, By loc, Duration timeOut) {
+    public boolean waitTillElementInvisible(T driver, By locator, Duration timeOut) {
         try{
             wait = new WebDriverWait(driver, timeOut);
-            return wait.until(ExpectedConditions.invisibilityOfElementLocated(loc));
-        }catch(Exception e){
+            return wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        }catch(TimeoutException e){
             return false;
         }
 
     }
-    public static boolean waitTillElementInvisible(WebDriver driver, By loc) {
+    public boolean waitTillElementInvisible(T driver, By locator) {
         try{
             wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
-            return wait.until(ExpectedConditions.invisibilityOfElementLocated(loc));
-        }catch(Exception e){
+            return wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        }catch(TimeoutException e){
             return false;
         }
 
     }
 
 
-    public static Boolean checkClickIntercepted(WebElement webElement) {
+    public Boolean checkClickIntercepted(WebElement webElement) {
         try {
             webElement.click();
             return false;
@@ -97,104 +129,30 @@ public class ActionMethods {
     }
 
 
-    public void HighlighterOnElem(WebDriver driver, WebElement Element) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');", Element);
-    }
-
-    public static void JavaScriptTextInput(WebDriver driver, WebElement webElement, String text) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].value='" + text + "';", webElement);
-    }
-
-    public static void JavaScriptClick(WebDriver driver, WebElement Element) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].click();", Element);
-    }
-
-    public void openNewWindowUsingJavaScript(WebDriver driver) {
-        wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
-        wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.open('');"));
-    }
-
-    public static Boolean isClickable(WebDriver driver, WebElement element) {
+    public Boolean isClickable(T driver, WebElement element) {
         wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
         return wait.until(ExpectedConditions.elementToBeClickable(element)).isDisplayed();
     }
-    public static Boolean isClickable(WebDriver driver, WebElement element,Duration timeOut) {
+    public Boolean isClickable(T driver, WebElement element,Duration timeOut) {
         wait = new WebDriverWait(driver, timeOut);
         return wait.until(ExpectedConditions.elementToBeClickable(element)).isDisplayed();
     }
 
-    public static void type(WebElement element, String str) {
+    public void type(WebElement element, String str) {
         element.click();
         element.sendKeys(str);
     }
-    public static void clearAndType(WebElement element, String str) {
+    public void clearAndType(WebElement element, String str) {
         element.clear();
         type(element,str);
     }
-
-    public static void scroll(WebDriver driver,boolean check, String X, String Y) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        Object o = check ? js.executeScript("window.scrollBy(" + X + "," + Y + ")", "") : js.executeScript("window.scrollBy(-" + X + ",-" + Y + ")", "");
+    public void click(T driver,WebElement element) {
+        assertThat(isClickable(driver, element)).isTrue();
+        element.click();
     }
 
-    @SneakyThrows
-    public static Boolean ScrollTillDisplayed(WebDriver driver, WebElement Element, boolean up, String X, String Y, int times) {
-        int counter = 0;
-        boolean flag = false;
-        while (!flag) {
-            counter++;
-            if (counter > times) {
-                Assert.fail("Failed while Scrolling to the element :: " + Element);
-            }
-            ActionMethods.scroll(driver, up, X, Y);
-            flag = Element.isDisplayed();
-        }
-        return flag;
-    }
 
-    public static Boolean ScrollTillInteractive(WebDriver driver, WebElement Element, boolean up, String X, String Y, int times) {
-            int counter = 0;
-            boolean flag = true;
-            while (flag) {
-                try {
-                    counter++;
-                    Element.click();
-                    flag = false;
-                } catch (ElementNotInteractableException e) {
-                    if (counter > times) {
-                        Assert.fail("Failed while Scrolling to the element :: " + Element);
-                    }
-                    ActionMethods.scroll(driver, up, X, Y);
-                }
-            }
-            return flag;
-    }
 
-    public static Boolean scrollTillElementFound(WebDriver driver, By loc, Boolean check, String X, String Y) {
-        try {
-            int counter = 0;
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            boolean flag = true;
-            while (flag) {
-                try {
-                    counter++;
-                    driver.findElement(loc);
-                    flag = false;
-                } catch (NoSuchElementException e) {
-                    if (counter > 20) {
-                        Assert.fail("Failed while scrolling and finding LOC :: " + String.valueOf(loc));
-                    }
-                    Object o = check ? js.executeScript("window.scrollBy(" + X + "," + Y + ")", "") : js.executeScript("window.scrollBy(-" + X + ",-" + Y + ")", "");
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     public static void setClipBoardData(String str) {
         StringSelection stringselection = new StringSelection(str);
@@ -254,25 +212,7 @@ public class ActionMethods {
         dropDown.deselectByValue(Value);
     }
 
-    public static void scrollDownBy(WebDriver driver, int val) {
-        wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
-        wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollBy(0, " + val + ")"));
-    }
 
-
-    public void scrollUpBy(WebDriver driver, int val) {
-        wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
-        wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollBy(0, -" + val + ")"));
-    }
-
-    public static void scrollDownPageBottom(WebDriver driver) {
-        wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
-        wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollTo(0,document.body.scrollHeight)"));
-    }
-    public static void scrollUpPageTop(WebDriver driver) {
-        wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
-        wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollTo(0,0)"));
-    }
 
 
 
@@ -319,11 +259,6 @@ public class ActionMethods {
         alert.accept();
     }
 
-    public void jsClick(WebDriver driver, WebElement element) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].click();", element);
-
-    }
 
     public WebElement matchTextFromChildOfListOfElementsAndReturnParentElement(WebDriver driver, List<WebElement> ListElem, By locator, String textValue) {
         WebElement ParentReturn = null;
@@ -456,6 +391,242 @@ public class ActionMethods {
     public void dragAndDropElement(WebDriver driver, WebElement source, WebElement destination) {
         actions = new Actions(driver);
         actions.dragAndDrop(source, destination).build().perform();
+    }
+
+    public static class JavaScriptUsage{
+        public void HighlighterOnElem(WebDriver driver, WebElement Element) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');", Element);
+        }
+
+        public static void JavaScriptTextInput(WebDriver driver, WebElement webElement, String text) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].value='" + text + "';", webElement);
+        }
+
+        public static void javaScriptClick(WebDriver driver, WebElement Element) {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", Element);
+        }
+
+        public void openNewWindowUsingJavaScript(WebDriver driver) {
+            wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
+            wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.open('');"));
+        }
+
+    }
+    public static class Swipe{
+        public void swipeRightToLeftFromElement(AppiumDriver driver,By locator) throws IOException {
+            Point point = new ActionMethods<AppiumDriver>().getLocation(driver,locator);
+            int startX = (int) (point.getX() * 0.95);
+            int endX = (int) (point.getX() * 0.05);
+            int startY = point.getY();
+            scroll(driver,startX, startY, endX, startY);
+        }
+
+        public void swipeLeftToRightFromElement(AppiumDriver driver,By locator) throws IOException {
+            Point point = new ActionMethods<AppiumDriver>().getLocation(driver,locator);
+            int startX = (int) (point.getX() * 0.95);
+            int endX = (int) (point.getX() * 0.05);
+            int startY = point.getY();
+            scroll(driver,endX, startY, startX, startY);
+        }
+
+
+        public void swipeRightToLeft(AppiumDriver driver) {
+            Dimension size = driver.manage().window().getSize();
+            int startY = (int) (size.height / 2);
+            int startX = (int) (size.width * 0.60);
+            int endX = (int) (size.width * 0.05);
+            scroll(driver,startX, startY, endX, startY);
+        }
+        public void swipeLeftToRight(AppiumDriver driver) {
+            Dimension size = driver.manage().window().getSize();
+            int startY = (int) (size.height / 2);
+            int startX = (int) (size.width * 0.05);
+            int endX = (int) (size.width * 0.60);
+            scroll(driver,startX, startY, endX, startY);
+        }
+
+    }
+
+    public static class Scroll{
+        public static class ScrollBrowser{
+            public void scroll(WebDriver driver,boolean check, String X, String Y) {
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                Object o = check ? js.executeScript("window.scrollBy(" + X + "," + Y + ")", "") : js.executeScript("window.scrollBy(-" + X + ",-" + Y + ")", "");
+            }
+
+            public static void scrollDownBy(WebDriver driver, int val) {
+                wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
+                wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollBy(0, " + val + ")"));
+            }
+
+
+            public void scrollUpBy(WebDriver driver, int val) {
+                wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
+                wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollBy(0, -" + val + ")"));
+            }
+
+            public static void scrollDownPageBottom(WebDriver driver) {
+                wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
+                wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollTo(0,document.body.scrollHeight)"));
+            }
+            public static void scrollUpPageTop(WebDriver driver) {
+                wait = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT_TIMEOUT_GENERIC));
+                wait.until(ExpectedConditions.javaScriptThrowsNoExceptions("window.scrollTo(0,0)"));
+            }
+            @SneakyThrows
+            public boolean ScrollTillDisplayed(WebDriver driver, WebElement Element, boolean up, String X, String Y, int times) {
+                int counter = 0;
+                boolean flag = false;
+                while (!flag) {
+                    counter++;
+                    if (counter > times) {
+                        Assert.fail("Failed while Scrolling to the element :: " + Element);
+                    }
+                    scroll(driver, up, X, Y);
+                    flag = Element.isDisplayed();
+                }
+                return flag;
+            }
+
+            public boolean ScrollTillInteractive(WebDriver driver, WebElement Element, boolean up, String X, String Y, int times) {
+                int counter = 0;
+                boolean flag = true;
+                while (flag) {
+                    try {
+                        counter++;
+                        Element.click();
+                        flag = false;
+                    } catch (ElementNotInteractableException e) {
+                        if (counter > times) {
+                            Assert.fail("Failed while Scrolling to the element :: " + Element);
+                        }
+                        scroll(driver, up, X, Y);
+                    }
+                }
+                return flag;
+            }
+
+            public boolean scrollTillElementFound(WebDriver driver, By loc, Boolean up, String X, String Y,int times) {
+                try {
+                    int counter = 0;
+                    boolean flag = true;
+                    while (flag) {
+                        try {
+                            counter++;
+                            driver.findElement(loc);
+                            flag = false;
+                        } catch (NoSuchElementException e) {
+                            if (counter > times) {
+                                Assert.fail("Failed while scrolling and finding LOC :: " + String.valueOf(loc));
+                            }
+                            scroll(driver, up, X, Y);
+                        }
+                    }
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+        }
+        public static class ScrollMobile{
+            public static void scroll(AppiumDriver driver, int startX, int startY, int endX, int endY) {
+                TouchAction touchAction = new TouchAction((PerformsTouchActions) MobileFactory.getDriverService());
+                touchAction.press(point(startX, startY))
+                        .waitAction(waitOptions(ofSeconds(1)))
+                        .moveTo(point(endX, endY))
+                        .release()
+                        .perform();
+            }
+
+
+            @SneakyThrows
+            public static void scrollVerticallyTopToBottom(AppiumDriver driver){
+                Dimension dimension = new ActionMethods<AppiumDriver>().getWindowSize(driver);
+                int endY = (int) (dimension.getHeight() * 0.7);
+                int startX = dimension.getWidth() / 2;
+                int startY = (int) (dimension.getHeight() * 0.40);
+                scroll(driver,startX, startY, startX, endY);
+
+            }
+
+            public static void scrollVerticallyBottomToTop(AppiumDriver driver) throws IOException {
+                Dimension dimension = new ActionMethods<AppiumDriver>().getWindowSize(driver);
+                int endY = (int) (dimension.getHeight() * 0.4);
+                int startX = dimension.getWidth() / 2;
+                int startY = (int) (dimension.getHeight() * 0.7);
+                scroll(driver,startX, startY, startX, endY);
+
+            }
+            public static void scrollVerticallyTopToBottomLarge(AppiumDriver driver) {
+                Dimension dimension = new ActionMethods<AppiumDriver>().getWindowSize(driver);
+                int startY = (int) (dimension.getHeight() * 0.09);
+                int startX = dimension.getWidth() / 2;
+                int endY = (int) (dimension.getHeight() * 0.7);
+                scroll(driver,startX, startY, startX, endY);
+            }
+
+            public  static void scrollVerticallyBottomToTopLarge(AppiumDriver driver) throws IOException {
+                Dimension dimension = new ActionMethods<AppiumDriver>().getWindowSize(driver);
+                int startY = (int) (dimension.getHeight() * 0.7);
+                int startX = dimension.getWidth() / 2;
+                int endY = (int) (dimension.getHeight() * 0.09);
+                scroll(driver,startX, startY, startX, endY);
+            }
+
+            @SneakyThrows
+            public static boolean scrollTillFoundUsingElement(AppiumDriver driver,WebElement element, By locator, int times, Boolean check){
+                int counter = 0;
+                while (element == null) {
+                    try {
+                        counter++;
+                        if (counter <= times) {
+                            if (check) {
+                                scrollVerticallyTopToBottom(driver);
+                            } else {
+                                scrollVerticallyBottomToTop(driver);
+                            }
+                        } else {
+                            Assert.fail("Did not find the element after scrolling :: "+counter+" no of times");
+                        }
+                        element = driver.findElement(locator);
+                    } catch (NoSuchElementException e) {
+                        log.info("Scrolled  for :: {} time", counter);
+                    }
+                }
+                return element.isDisplayed();
+            }
+
+            public static void scrollVerticallyWithCoordinate(AppiumDriver driver,double yStart, double yEnd){
+                Dimension dimension = new ActionMethods<AppiumDriver>().getWindowSize(driver);
+                int startY = (int) (dimension.getHeight() * yStart);
+                int startX = dimension.getWidth() / 2;
+                int endY = (int) (dimension.getHeight() * yEnd);
+                scroll(driver,startX, startY, startX, endY);
+            }
+
+
+
+            @SneakyThrows
+            public static boolean scrollVerticallyUntilSingleElementFound(AppiumDriver driver,By locator, int times) {
+                boolean flag = false;
+                int count = 0;
+                while (new ActionMethods<AppiumDriver>().getSize(driver,locator) == 0) {
+                    scrollVerticallyBottomToTopLarge(driver);
+                    count++;
+                    if (count > times) {
+                        break;
+                    }
+                }
+                if (new ActionMethods<AppiumDriver>().getSize(driver,locator) > 0) {
+                    flag = true;
+                }
+                return flag;
+            }
+        }
+
     }
 
 }
