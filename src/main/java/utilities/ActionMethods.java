@@ -1,6 +1,5 @@
 package utilities;
 
-import driver.MobileFactory;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
@@ -11,8 +10,6 @@ import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Action;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
@@ -34,7 +31,7 @@ import static io.appium.java_client.touch.WaitOptions.waitOptions;
 import static io.appium.java_client.touch.offset.PointOption.point;
 import static java.time.Duration.ofSeconds;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static utilities.ActionMethods.Scroll.ScrollMobile.scroll;
+import static utilities.ActionMethods.Scroll.ScrollMobile.scrollTo;
 
 
 @Slf4j
@@ -43,7 +40,9 @@ public class ActionMethods<T extends WebDriver> {
     public static WebDriverWait wait;
     public static Actions actions;
     public static BiFunction<String, String, String> stringReplacer = String::format;
-
+    public Scroll scroll(){
+        return  new Scroll();
+    }
     public static Boolean validatePageError(WebDriver driver) {
         String title = driver.getTitle();
         return !title.contains("404") && !title.contains("500") && !title.contains("Not") && !title.contains("Error") && !title.contains("wrong");
@@ -415,42 +414,17 @@ public class ActionMethods<T extends WebDriver> {
         }
 
     }
-    public static class Swipe{
-        public void swipeRightToLeftFromElement(AppiumDriver driver,By locator) throws IOException {
-            Point point = new ActionMethods<AppiumDriver>().getLocation(driver,locator);
-            int startX = (int) (point.getX() * 0.95);
-            int endX = (int) (point.getX() * 0.05);
-            int startY = point.getY();
-            scroll(driver,startX, startY, endX, startY);
+
+    public static  class Scroll{
+        public ScrollBrowser scrollBrowser(){
+            return new ScrollBrowser();
         }
-
-        public void swipeLeftToRightFromElement(AppiumDriver driver,By locator) throws IOException {
-            Point point = new ActionMethods<AppiumDriver>().getLocation(driver,locator);
-            int startX = (int) (point.getX() * 0.95);
-            int endX = (int) (point.getX() * 0.05);
-            int startY = point.getY();
-            scroll(driver,endX, startY, startX, startY);
+        public ScrollMobile scrollMobile(){
+            return new ScrollMobile();
         }
-
-
-        public void swipeRightToLeft(AppiumDriver driver) {
-            Dimension size = driver.manage().window().getSize();
-            int startY = (int) (size.height / 2);
-            int startX = (int) (size.width * 0.60);
-            int endX = (int) (size.width * 0.05);
-            scroll(driver,startX, startY, endX, startY);
+        public SwipeMobile swipeMobile(){
+            return new SwipeMobile();
         }
-        public void swipeLeftToRight(AppiumDriver driver) {
-            Dimension size = driver.manage().window().getSize();
-            int startY = (int) (size.height / 2);
-            int startX = (int) (size.width * 0.05);
-            int endX = (int) (size.width * 0.60);
-            scroll(driver,startX, startY, endX, startY);
-        }
-
-    }
-
-    public static class Scroll{
         public static class ScrollBrowser{
             public void scroll(WebDriver driver,boolean check, String X, String Y) {
                 JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -532,8 +506,8 @@ public class ActionMethods<T extends WebDriver> {
             }
         }
         public static class ScrollMobile{
-            public static void scroll(AppiumDriver driver, int startX, int startY, int endX, int endY) {
-                TouchAction touchAction = new TouchAction((PerformsTouchActions) MobileFactory.getDriverService());
+            public static void scrollTo(AppiumDriver driver, int startX, int startY, int endX, int endY) {
+                TouchAction touchAction = new TouchAction((PerformsTouchActions) driver);
                 touchAction.press(point(startX, startY))
                         .waitAction(waitOptions(ofSeconds(1)))
                         .moveTo(point(endX, endY))
@@ -548,7 +522,7 @@ public class ActionMethods<T extends WebDriver> {
                 int endY = (int) (dimension.getHeight() * 0.7);
                 int startX = dimension.getWidth() / 2;
                 int startY = (int) (dimension.getHeight() * 0.40);
-                scroll(driver,startX, startY, startX, endY);
+                scrollTo(driver,startX, startY, startX, endY);
 
             }
 
@@ -557,7 +531,7 @@ public class ActionMethods<T extends WebDriver> {
                 int endY = (int) (dimension.getHeight() * 0.4);
                 int startX = dimension.getWidth() / 2;
                 int startY = (int) (dimension.getHeight() * 0.7);
-                scroll(driver,startX, startY, startX, endY);
+                scrollTo(driver,startX, startY, startX, endY);
 
             }
             public static void scrollVerticallyTopToBottomLarge(AppiumDriver driver) {
@@ -565,7 +539,7 @@ public class ActionMethods<T extends WebDriver> {
                 int startY = (int) (dimension.getHeight() * 0.09);
                 int startX = dimension.getWidth() / 2;
                 int endY = (int) (dimension.getHeight() * 0.7);
-                scroll(driver,startX, startY, startX, endY);
+                scrollTo(driver,startX, startY, startX, endY);
             }
 
             public  static void scrollVerticallyBottomToTopLarge(AppiumDriver driver) throws IOException {
@@ -573,7 +547,7 @@ public class ActionMethods<T extends WebDriver> {
                 int startY = (int) (dimension.getHeight() * 0.7);
                 int startX = dimension.getWidth() / 2;
                 int endY = (int) (dimension.getHeight() * 0.09);
-                scroll(driver,startX, startY, startX, endY);
+                scrollTo(driver,startX, startY, startX, endY);
             }
 
             @SneakyThrows
@@ -604,7 +578,7 @@ public class ActionMethods<T extends WebDriver> {
                 int startY = (int) (dimension.getHeight() * yStart);
                 int startX = dimension.getWidth() / 2;
                 int endY = (int) (dimension.getHeight() * yEnd);
-                scroll(driver,startX, startY, startX, endY);
+                scrollTo(driver,startX, startY, startX, endY);
             }
 
 
@@ -625,6 +599,41 @@ public class ActionMethods<T extends WebDriver> {
                 }
                 return flag;
             }
+
+        }
+        public static class SwipeMobile{
+            public void swipeRightToLeftFromElement(AppiumDriver driver,By locator) throws IOException {
+                Point point = new ActionMethods<AppiumDriver>().getLocation(driver,locator);
+                int startX = (int) (point.getX() * 0.95);
+                int endX = (int) (point.getX() * 0.05);
+                int startY = point.getY();
+                scrollTo(driver,startX, startY, endX, startY);
+            }
+
+            public void swipeLeftToRightFromElement(AppiumDriver driver,By locator) throws IOException {
+                Point point = new ActionMethods<AppiumDriver>().getLocation(driver,locator);
+                int startX = (int) (point.getX() * 0.95);
+                int endX = (int) (point.getX() * 0.05);
+                int startY = point.getY();
+                scrollTo(driver,endX, startY, startX, startY);
+            }
+
+
+            public void swipeRightToLeft(AppiumDriver driver) {
+                Dimension size = driver.manage().window().getSize();
+                int startY = (int) (size.height / 2);
+                int startX = (int) (size.width * 0.60);
+                int endX = (int) (size.width * 0.05);
+                scrollTo(driver,startX, startY, endX, startY);
+            }
+            public void swipeLeftToRight(AppiumDriver driver) {
+                Dimension size = driver.manage().window().getSize();
+                int startY = (int) (size.height / 2);
+                int startX = (int) (size.width * 0.05);
+                int endX = (int) (size.width * 0.60);
+                scrollTo(driver,startX, startY, endX, startY);
+            }
+
         }
 
     }
