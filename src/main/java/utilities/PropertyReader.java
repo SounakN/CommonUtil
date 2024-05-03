@@ -2,6 +2,7 @@ package utilities;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +25,8 @@ public class PropertyReader {
         try {
             InputStream fs = PropertyReader.class.getClassLoader().getResourceAsStream(fileName);
             props.load(fs);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Assert.fail("Failed due to exception while trying to read the property file :: "+e.getMessage());
         }
         return props;
     }
@@ -34,7 +35,7 @@ public class PropertyReader {
     public static Properties loadAllProperties(String rootEnv) {
         Properties props = new Properties();
         Path path = new File(Objects.requireNonNull(PropertyReader.class.getClassLoader().getResource("")).getFile()).toPath();
-        Path pathTillDataConfig = Files.list(path).filter(rootFile -> rootFile.getFileName().toString().equals("DataConfig")).findFirst().get();
+        Path pathTillDataConfig = Files.list(path).filter(rootFile -> rootFile.getFileName().toString().equals(DATA_CONFIG)).findFirst().get();
         Files.list(pathTillDataConfig).filter(rootFile -> rootFile.getFileName().toString().endsWith(".properties")).forEach(file -> {
             props.putAll(getProperties(DATA_CONFIG + File.separator + file.getFileName()));
         });

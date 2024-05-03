@@ -12,46 +12,27 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <junit.version>5.9.2</junit.version>
-        <cucumber.version>7.4.1</cucumber.version>
+        <junit.version>4.13.2</junit.version>
         <selenium.version>4.12.1</selenium.version>
         <appium.version>8.3.0</appium.version>
-        <maven.version>3.0.0-M8</maven.version>
-        <skipPluginPhase>test</skipPluginPhase>
-        <maven.skip.test>false</maven.skip.test>
+        <cucumber.version>7.17.0</cucumber.version>
+        <lombok.version>1.18.32</lombok.version>
+        <assertJ.version>3.24.2</assertJ.version>
+        <slf4j.version>2.0.6</slf4j.version>
     </properties>
     <dependencies>
-
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-java -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
             <version>${cucumber.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-junit -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>${cucumber.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-core -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-core</artifactId>
-            <version>${cucumber.version}</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-picocontainer -->
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-picocontainer</artifactId>
-            <version>${cucumber.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -68,29 +49,32 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
-            <scope>provided</scope>
+            <version>${lombok.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
         <dependency>
@@ -98,7 +82,6 @@
             <artifactId>poi-ooxml</artifactId>
             <version>5.2.3</version>
         </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -111,135 +94,22 @@
             <artifactId>poi-scratchpad</artifactId>
             <version>5.2.3</version>
         </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
-            <scope>compile</scope>
+            <version>${assertJ.version}</version>
         </dependency>
-
-
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>${maven.version}</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.6</version>
+            <version>${slf4j.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.version}</version>
-                <!-- <configuration>
-                     <testFailureIgnore>true</testFailureIgnore>
-                     <includes>
-                         <include>**/ParallelTestRunner.java</include>
-                     </includes>
-                     <parallel>methods</parallel>
-                     <threadCount>2</threadCount>
-                     <perCoreThreadCount>false</perCoreThreadCount>
-                 </configuration>-->
-                <configuration>
-                    <skipTests>${maven.skip.test}</skipTests>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>parallel-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <testFailureIgnore>true</testFailureIgnore>
-                            <includes>
-                                <include>**/ParallelTestRunner.java</include>
-                            </includes>
-                            <parallel>methods</parallel>
-                            <threadCount>2</threadCount>
-                            <perCoreThreadCount>false</perCoreThreadCount>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>sequential-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <testFailureIgnore>true</testFailureIgnore>
-                            <includes>
-                                <include>**/SequentialTestRunner.java</include>
-                            </includes>
-                            <parallel>methods</parallel>
-                            <threadCount>1</threadCount>
-                            <perCoreThreadCount>false</perCoreThreadCount>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>net.masterthought</groupId>
-                <artifactId>maven-cucumber-reporting</artifactId>
-                <version>3.16.0</version>
-                <executions>
-                    <execution>
-                        <id>execution-Combined</id>
-                        <phase>${skipPluginPhase}</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <projectName>>cucumber-jvm-example</projectName>
-                            <outputDirectory>${project.build.directory}/reports/combined</outputDirectory>
-                            <cucumberOutput>${project.build.directory}/reports</cucumberOutput>
-                            <parallelTesting>true</parallelTesting>
-                            <checkBuildResult>false</checkBuildResult>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>execution-Sequential</id>
-                        <phase>${skipPluginPhase}</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <projectName>>cucumber-jvm-example</projectName>
-                            <outputDirectory>${project.build.directory}/reports/Sequential</outputDirectory>
-                            <cucumberOutput>${project.build.directory}/reports/cucumberSequential.json</cucumberOutput>
-                            <!--<parallelTesting>true</parallelTesting>-->
-                            <checkBuildResult>false</checkBuildResult>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>execution-Parallel</id>
-                        <phase>${skipPluginPhase}</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <projectName>>cucumber-jvm-example</projectName>
-                            <outputDirectory>${project.build.directory}/reports/Parallel</outputDirectory>
-                            <cucumberOutput>${project.build.directory}/reports/cucumberParallel.json</cucumberOutput>
-                            <!-- <parallelTesting>true</parallelTesting>-->
-                            <checkBuildResult>false</checkBuildResult>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

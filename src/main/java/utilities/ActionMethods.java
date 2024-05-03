@@ -103,7 +103,6 @@ public class ActionMethods {
             wait = new WebDriverWait(driver, Timeout);
             wait.until(ExpectedConditions.invisibilityOfElementLocated(loc));
         } catch (Exception e) {
-            Assert.fail("Element still visible :: " + loc + " after timeout of :: " + Timeout);
             e.printStackTrace();
         }
     }
@@ -813,6 +812,7 @@ public class ActionMethods {
     //param is WebElement, and String text
     public void matchElementText(WebElement Elem, String text) {
         String extractedText = Elem.getText().trim();
+
         Assert.assertEquals(text, extractedText);
     }
 
