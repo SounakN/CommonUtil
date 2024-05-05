@@ -10,8 +10,8 @@ public class MobileFactory {
     private static Mobiles MobilesDriver;
 
     @SneakyThrows
-    public void setMobileType(String BrowserType) throws Exception {
-        MobilesDriver = Mobiles.get(BrowserType);
+    public void setMobileType(String mobileType) throws Exception {
+        MobilesDriver = Mobiles.get(mobileType);
         System.out.println("Driver to be set is: " + MobilesDriver);
         if (DriverService.get() == null) {
             switch (MobilesDriver) {

@@ -75,9 +75,9 @@ public class FFDriver implements IDriver {
         if (BasicConstants.incognito.equals("true")) {
             options.addArguments("-private");
         }
-        if (BasicConstants.headless.equals("true")) {
+       /* if (BasicConstants.headless.equals("true")) {
             options.setHeadless(true);
-        }
+        }*/
         if (BasicConstants.IsRemote.equals("true")) {
             capabilities.setBrowserName("firefox");
             options.merge(capabilities);

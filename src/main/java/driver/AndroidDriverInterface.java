@@ -3,11 +3,12 @@ package driver;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.Setting;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
+import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import lombok.SneakyThrows;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import utilities.PropertyUtil;
 
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 import static driver.BasicConstants.*;
+import static org.openqa.selenium.remote.CapabilityType.PLATFORM_NAME;
 
 public interface AndroidDriverInterface extends IMobDriver {
 
@@ -57,6 +59,7 @@ public interface AndroidDriverInterface extends IMobDriver {
             if (browserStackSwitch.equals("false")) {
                 if (service == null) {
                     service = AppiumDriverLocalService.buildService(new AppiumServiceBuilder().usingAnyFreePort().withArgument(() -> "--allow-insecure", "chromedriver_autodownload"));
+                    /*service=  AppiumDriverLocalService.buildDefaultService();*/
                 }
                 service.start();
             }/*else if(BasicConstants.browserstack_local.equalsIgnoreCase("true") && BasicConstants.Browserstack_switch.equals("true") ){
@@ -103,18 +106,18 @@ public interface AndroidDriverInterface extends IMobDriver {
 
             } else {
                 DesiredCapabilities capabilities = new DesiredCapabilities();
-                capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, ANDROID_PLATFORM_NAME);
-                capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, mobileDeviceAndroidVersion);
-                capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, mobileDeviceAndroid);
-                capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, ANDROID_AUTOMATION_NAME);
-                capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, mobileBrowserAndroid);
-                capabilities.setCapability("nativeWebScreenshot", "true");
-                capabilities.setCapability("noReset", "true");
-                capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, APPIUM_COMMAND_TIMEOUT);
+                capabilities.setCapability(PLATFORM_NAME, ANDROID_PLATFORM_NAME);
+                capabilities.setCapability("platformVersion", mobileDeviceAndroidVersion);
+                capabilities.setCapability("deviceName", mobileDeviceAndroid);
+                capabilities.setCapability("automationName", ANDROID_AUTOMATION_NAME);
+                capabilities.setCapability("browserName", mobileBrowserAndroid);
+               /* capabilities.setCapability("nativeWebScreenshot", "true");*/
+              /*  capabilities.setCapability("noReset", "true");*/
+               /* capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, APPIUM_COMMAND_TIMEOUT);*/
                 try {
                     driver = new AndroidDriver(AndroidMobileWeb.service.getUrl(), capabilities);
-                   /* URL url =new URL("http://127.0.0.1:4723/wd/hub");
-                    driver= new AndroidDriver(url,capabilities);*/
+                   /* URL url =new URL("http://localhost:4723/wd/hub/");
+                    driver= new AppiumDriver(url,capabilities);*/
                     //driver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 300);
 
                 } catch (Exception e) {
@@ -226,18 +229,21 @@ public interface AndroidDriverInterface extends IMobDriver {
 
             } else {
                 DesiredCapabilities capabilities = new DesiredCapabilities();
-                capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, mobileDeviceAndroid);
-                capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, ANDROID_AUTOMATION_NAME);
+                capabilities.setCapability("platformName", "Android");
+                capabilities.setCapability("deviceName", mobileDeviceAndroid);
+                capabilities.setCapability("automationName", ANDROID_AUTOMATION_NAME);
                 Path pathRoot = new File(Objects.requireNonNull(AndroidDriverInterface.class.getClassLoader().getResource("")).getFile()).toPath();
-                Path pathToApp = Paths.get(pathRoot.toString(), "APK", prop.getProperty("apkType"), prop.getProperty("Mobile_app_name_android"));
-                capabilities.setCapability(MobileCapabilityType.APP, pathToApp.toString());
-                /*       capabilities.setCapability("appPackage", BasicConstants.AppPackage);*/
-                //capabilities.setCapability("appWaitActivity",BasicConstants.AppWaitActivity);
-                capabilities.setCapability(MobileCapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
+                Path pathToApp = Paths.get(pathRoot.toString(), "APP", "Android",prop.getProperty("apkType"), prop.getProperty("Mobile_app_name_android"));
+                capabilities.setCapability("app", pathToApp.toString());
+                       capabilities.setCapability("appPackage", BasicConstants.AppPackage);
+             /*   capabilities.setCapability("appWaitActivity",BasicConstants.AppWaitActivity);*/
+              /*  capabilities.setCapability(MobileCapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);*/
                 capabilities.setCapability("autoGrantPermissions", true);
                 capabilities.setCapability("locationServiceAuthorized", true);
                 try {
                     driver = new AndroidDriver(AndroidNative.service.getUrl(), capabilities);
+                   /*   URL url =new URL("http://127.0.0.1:4723/wd/hub");
+                    driver= new AppiumDriver(url,capabilities);*/
                     driver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 100);
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -11,8 +11,8 @@ public class BasicConstants {
     public static final int IMPLICIT_WAIT_TIMEOUT_GENERIC = 60;
     public static final int EXPLICIT_WAIT_TIMEOUT_GENERIC = 30;
     public static final int APPIUM_COMMAND_TIMEOUT = 30;
-    public static final String ANDROID_PLATFORM_NAME = "ANDROID";
-    public static final String ANDROID_AUTOMATION_NAME = "UIAutomator2";
+    public static final String ANDROID_PLATFORM_NAME = "Android";
+    public static final String ANDROID_AUTOMATION_NAME = "UiAutomator2";
 
     public static final String EXCEL_FOLDER_NAME = "ExcelFiles";
     public static final String DATA_CONFIG = "DataConfig";
@@ -29,8 +29,8 @@ public class BasicConstants {
     public static String mobileBrowserAndroid = (System.getProperty("Browser_mobile_android") != null) ? System.getProperty("Browser_mobile_android") : PropertyUtil.getProperties().getProperty("Browser_mobile_android");
     public static String mobileDeviceAndroidVersion = (System.getProperty("Mobile_device_android_version") != null) ? System.getProperty("Mobile_device_android_version") : PropertyUtil.getProperties().getProperty("Mobile_device_android_version");
     public static String AppWaitActivity = "com.upgrad.student.unified.ui.dashboard.activities.UnifiedDashboardActivity";
-    public static String AppActivity = "com.upgrad.student.unified.ui.splash.activities.SplashScreenActivity";
-    /* public static String AppPackage = "com.upgrad.student.test"*/;
+    public static String AppActivity = "com.cheq.retail.ui.splash.SplashActivity";
+     public static String AppPackage = "com.cheq.retail.uat";
 
     //Required for iOS Mobile driver
     public static String mobileDeviceIos = (System.getProperty("Mobile_device_ios") != null) ? System.getProperty("Mobile_device_ios") : PropertyUtil.getProperties().getProperty("Mobile_device_ios");
