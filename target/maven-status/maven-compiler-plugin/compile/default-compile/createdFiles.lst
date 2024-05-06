@@ -28,9 +28,11 @@ driver\WebBrowserFactory.class
 utilities\FileUtilities.class
 driver\MobileFactory$1.class
 utilities\Basic_Excel_Writer.class
+utilities\ActionMethods$Reporting.class
 Constants\ConstantsForTeamsSettings.class
 utilities\ActionMethods$MobileActions$Wifi.class
 driver\CHDriver.class
+utilities\ActionMethods$ActionsCommands.class
 driver\FFDriver.class
 utilities\ReaderModels.class
 utilities\ActionMethods$BrowserActions.class

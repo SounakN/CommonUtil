@@ -7,6 +7,8 @@ import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.connection.ConnectionStateBuilder;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.service.local.AppiumDriverLocalService;
+import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.touch.TapOptions;
 import io.cucumber.java.Scenario;
 import lombok.SneakyThrows;
@@ -55,6 +57,12 @@ public class ActionMethods<T extends WebDriver> {
     }
     public BrowserActions<T> browserActions(){
         return  new BrowserActions<T>();
+    }
+    public ActionsCommands<T> actionsCommands(){
+        return new ActionsCommands<T>();
+    }
+    public Reporting<T> reporting(){
+        return new Reporting<T>();
     }
     public static Boolean validatePageError(WebDriver driver) {
         String title = driver.getTitle();
@@ -150,13 +158,13 @@ public class ActionMethods<T extends WebDriver> {
         return wait.until(ExpectedConditions.elementToBeClickable(element)).isDisplayed();
     }
 
-    public void type(WebElement element, String value) {
-        element.click();
+    public void type(T driver,WebElement element, String value) {
+        click(driver,element);
         element.sendKeys(value);
     }
-    public void clearAndType(WebElement element, String value) {
+    public void clearAndType(T driver,WebElement element, String value) {
         element.clear();
-        type(element,value);
+        type(driver,element,value);
     }
     public void click(T driver,WebElement element) {
         assertThat(isClickable(driver, element)).isTrue();
@@ -253,13 +261,18 @@ public class ActionMethods<T extends WebDriver> {
         }
         return toFind;
     }
-
-
-    public static void embedScreenshot(WebDriver driver, Scenario result, String message) {
+public static class Reporting<T>{
+    public  void embedScreenshot(T driver, Scenario result, String message) {
         byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
         result.attach(screenshot, "image/png", message);
         result.log(message);
     }
+    public void embedText(Scenario result, String message) {
+        result.log(message);
+    }
+}
+
+
 
     public static Boolean waitTillElementTextChanges(WebDriver driver, By loc, String Text, Duration time) {
         try {
@@ -280,9 +293,7 @@ public class ActionMethods<T extends WebDriver> {
     }
 
 
-    public static void embedText(Scenario result, String message) {
-        result.log(message);
-    }
+
 
     public WebElement findElement(By locator, T driver, Duration timeout, Duration pollTime) {
         try {
@@ -321,18 +332,27 @@ public class ActionMethods<T extends WebDriver> {
         return webElement.getText().trim();
     }
 
-    public static void moveTo(WebDriver driver, WebElement webElement) {
-        actions = new Actions(driver);
-        actions.moveToElement(webElement).perform();
-    }
-    public static void moveToAndClick(WebDriver driver, WebElement webElement) {
-        actions = new Actions(driver);
-        actions.moveToElement(webElement).click().perform();
-    }
 
-    public void dragAndDropElement(WebDriver driver, WebElement source, WebElement destination) {
-        actions = new Actions(driver);
-        actions.dragAndDrop(source, destination).build().perform();
+    public static class ActionsCommands<T extends WebDriver>{
+
+        public void moveToElementAndClick(T driver, WebElement webElement) {
+            actions = new Actions(driver);
+            actions.moveToElement(webElement).click().perform();
+        }
+        public void moveToElement(T driver,WebElement webElement){
+            actions = new Actions(driver);
+            actions.moveToElement(webElement).build().perform();
+        }
+        public void type(T driver,String value){
+            actions = new Actions(driver);
+            actions.sendKeys(value).build().perform();
+        }
+        public void dragAndDropElement(WebDriver driver, WebElement source, WebElement destination) {
+            actions = new Actions(driver);
+            actions.dragAndDrop(source, destination).build().perform();
+        }
+
+
     }
 
 
@@ -355,12 +375,20 @@ public class ActionMethods<T extends WebDriver> {
         public SetContext<U> setContext(){
             return new SetContext<U>();
         }
+        public static AppiumDriverLocalService appiumServiceBuilder(AppiumDriverLocalService appiumDriverLocalService){
+            if (appiumDriverLocalService == null) {
+                appiumDriverLocalService = AppiumDriverLocalService.buildService(new AppiumServiceBuilder().usingAnyFreePort().withArgument(() -> "--allow-insecure", "chromedriver_autodownload"));
+            }
+            appiumDriverLocalService.start();
+            return appiumDriverLocalService;
+        }
+
         public static class SetContext<U extends AppiumDriver> {
             public void switchToWebViewAndroid(U driver) {
                 Set<String> contexts = ((AndroidDriver)driver).getContextHandles();
                 for (String context : contexts) {
                     if (!context.equals("NATIVE_APP")) {
-                        ((AndroidDriver) MobileFactory.getDriverService()).context((String) contexts.toArray()[1]);
+                        ((AndroidDriver) driver).context((String) contexts.toArray()[1]);
                         break;
                     }
                 }
@@ -369,7 +397,7 @@ public class ActionMethods<T extends WebDriver> {
                 Set<String> contexts = ((IOSDriver)driver).getContextHandles();
                 for (String context : contexts) {
                     if (!context.equals("NATIVE_APP")) {
-                        ((AndroidDriver) MobileFactory.getDriverService()).context((String) contexts.toArray()[1]);
+                        ((IOSDriver) driver).context((String) contexts.toArray()[1]);
                         break;
                     }
                 }

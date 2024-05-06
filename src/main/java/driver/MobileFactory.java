@@ -25,7 +25,7 @@ public class MobileFactory {
     }
 
     @SneakyThrows
-    public static synchronized AppiumDriver getDriverService() {
+    public synchronized AppiumDriver getDriverService() {
         return DriverService.get().get();
     }
 

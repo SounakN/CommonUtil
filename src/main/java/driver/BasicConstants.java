@@ -28,7 +28,7 @@ public class BasicConstants {
     public static String mobileDeviceAndroid = (System.getProperty("Mobile_device_android") != null) ? System.getProperty("Mobile_device_android") : PropertyUtil.getProperties().getProperty("Mobile_device_android");
     public static String mobileBrowserAndroid = (System.getProperty("Browser_mobile_android") != null) ? System.getProperty("Browser_mobile_android") : PropertyUtil.getProperties().getProperty("Browser_mobile_android");
     public static String mobileDeviceAndroidVersion = (System.getProperty("Mobile_device_android_version") != null) ? System.getProperty("Mobile_device_android_version") : PropertyUtil.getProperties().getProperty("Mobile_device_android_version");
-    public static String AppWaitActivity = "com.upgrad.student.unified.ui.dashboard.activities.UnifiedDashboardActivity";
+  /*  public static String AppWaitActivity = "com.upgrad.student.unified.ui.dashboard.activities.UnifiedDashboardActivity";*/
     public static String AppActivity = "com.cheq.retail.ui.splash.SplashActivity";
      public static String AppPackage = "com.cheq.retail.uat";
 
