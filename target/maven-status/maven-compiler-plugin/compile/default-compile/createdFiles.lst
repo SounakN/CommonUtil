@@ -26,6 +26,7 @@ utilities\ActionMethods$BrowserActions$ScrollBrowser.class
 driver\IDriver.class
 driver\WebBrowserFactory.class
 utilities\FileUtilities.class
+utilities\TestUtilities.class
 driver\MobileFactory$1.class
 utilities\Basic_Excel_Writer.class
 utilities\ActionMethods$Reporting.class
